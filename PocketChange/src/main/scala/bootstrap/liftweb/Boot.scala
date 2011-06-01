@@ -3,7 +3,7 @@ package bootstrap.liftweb
 import java.sql.{Connection, DriverManager}
 
 import net.liftweb.common.{Box,Empty,Failure,Full,Logger}
-import net.liftweb.util.{Helpers,LoanWrapper}
+import net.liftweb.util.{Helpers,LoanWrapper,Props}
 import net.liftweb.http.{GetRequest,LiftRules,ParsePath,PutRequest,Req,
                          RequestVar,RewriteRequest,RewriteResponse,S}
 import org.slf4j.MDC
@@ -166,22 +166,8 @@ object MenuInfo {
   
 }
 
-object DBVendor extends ConnectionManager {
-  def newConnection(name: ConnectionIdentifier): Box[Connection] = {
-    try {
-      /** Uncomment if you really want Derby
-       * 
-      Class.forName("org.apache.derby.jdbc.EmbeddedDriver")
-      val dm = DriverManager.getConnection("jdbc:derby:pca_example;create=true")
-      */
-
-      Class.forName("org.h2.Driver")
-      val dm = DriverManager.getConnection("jdbc:h2:pca_example")
-      Full(dm)
-    } catch {
-      case e : Exception => e.printStackTrace; Empty
-    }
-  }
-  def releaseConnection(conn: Connection) {conn.close}
-}
-
+object DBVendor extends StandardDBVendor(
+  Props.get("db.class").openOr("Invalid DB class"),
+  Props.get("db.url").openOr("Invalid DB url"),
+  Props.get("db.user"),
+  Props.get("db.pass"))

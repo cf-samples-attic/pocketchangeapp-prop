@@ -1,0 +1,4 @@
+# Properties in this file will be read when running in dev mode
+db.class=org.h2.Driver
+db.url=jdbc:h2:pca_example
+
